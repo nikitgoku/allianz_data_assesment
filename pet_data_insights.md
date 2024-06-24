@@ -5,7 +5,7 @@ Additionally, it includes SQL statements for implementation and suggestions for 
 
 The task follows structured approach to complete the assigned task and address the questions.
 The data is loaded into PostgreSQL to explore, process, analyse and suggest some improvements to make data production-ready.
-The ```pet_data_schemal.sql``` script can be referred and used for this purpose.
+The ```pet_data_schemal.sql``` script in the ```/scritps/``` folder can be referred and used for this purpose.
 
 ### 1. Data Exploration
 The each individual data is loaded into a table to inspect the  data and understand the structure and content.

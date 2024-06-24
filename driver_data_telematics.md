@@ -8,6 +8,7 @@ The aim is to uncover meaningful insights from the provided dataset, with a focu
 4. Correlations between driver characteristics (e.g., gender, age) and driving scores
 
 The analysis will explore these aspects to identify patterns and relationships that could inform insurance-related decision-making processes.
+The ```driver_telematics.ipynb``` notebook in the ```/scripts/``` folder can be referenced and used.
 
 ### **Dataset Overview**
 This dataset included information related to driver telematics which gives information about premium charged on a driver based on all the telematics around driver. This data contains aggregated information of 335 drivers along with their personal information in addition to the type of car they drive, distances travelled, driving score, speeding events, and risk events.

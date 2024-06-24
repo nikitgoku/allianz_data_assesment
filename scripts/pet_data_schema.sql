@@ -1,11 +1,23 @@
 /* ------------------------------------------------------------ */
-/*  Version    : 0.1    							            */
+/*  Version    : 0.3    							             */
 /*  Created On : 21-Jun-2024 23:11:04                           */
 /*  Created By : Nikit Gokhale                                  */
 /*  DBMS       : PostgreSQL                                     */
 /*  Notes      : Script to create Pet Insurance schema          */
 /* ------------------------------------------------------------ */
 
+/*
+To complete the assigned tasks and address the questions, let's follow a structured approach that includes 
+1. Data Exploration, 
+2. Task Completion
+3. Data Integrity Checks, 
+4. Data Transformation
+5. Data Improvements and Quality Checks
+*/
+
+-- 1. Data Exploration
+-- Load the data into data tables and inspect the data to understand
+-- the structure and content
 -- Create claims_data table
 CREATE TABLE claims_data (
 	claim_id INTEGER
@@ -34,7 +46,7 @@ CREATE TABLE condition_data (
 
 -- Load data into claims_data table
 COPY claims_data(claim_id)
-	FROM '/Users/nikit/Documents/DataAssesment_Allianz/claims_data.csv'
+	FROM 'file:://dataset/pet_data/claims_data.csv'
 	DELIMITER ','
 	CSV HEADER
 ;
@@ -45,7 +57,7 @@ SELECT * FROM claims_data
 
 -- Load data into audit_status data table
 COPY audit_status(claim_id, claim_audit_status)
-	FROM '/Users/nikit/Documents/DataAssesment_Allianz/audit_status_data.csv'
+	FROM 'file:://dataset/pet_data/audit_status_data.csv'
 	DELIMITER ','
 	CSV HEADER
 ;
@@ -56,7 +68,7 @@ SELECT * FROM audit_status
 
 -- Load data into condition_data table
 COPY condition_data(claim_id, condition_id, condition_migrated_flag, condition_type_desc, condition_type_code, condition_treatment_start_date, condition_known_from_date, condition_claimed_amount, condition_net_amount, condition_rejected_amount, condition_excess_amount)
-	FROM '/Users/nikit/Documents/DataAssesment_Allianz/condition_data.csv'
+	FROM 'file:://dataset/pet_data/condition_data.csv'
 	DELIMITER ','
 	CSV HEADER
 ;
@@ -65,6 +77,23 @@ COPY condition_data(claim_id, condition_id, condition_migrated_flag, condition_t
 SELECT * FROM condition_data
 ;
 
+
+/*
+Data Insights:
+1. claims_data
+This table contains claim IDs.
+2. audit_status
+This table contains claim IDs and their corresponding audit status.
+3. condition_data
+This table contains detailed information about the conditions associated with each claim.
+*/
+
+
+/*
+Expand the dataset
+Join audit_status_data and condition_data with claims_data.
+Create views to support future queries and future reusability
+*/
 -- Join Audit Data table with Claims Data table
 SELECT cd.claim_id,
 	   ad.claim_audit_status
@@ -88,6 +117,7 @@ FROM claims_data cd
 LEFT JOIN condition_data co ON cd.claim_id = co.claim_id
 ;
 
+-- Task 1.0 Expand the dataset
 -- 1.1
 -- Join Audit Data with Claims Data table
 -- Also create views to simlify future queries and reusability
@@ -125,7 +155,7 @@ LEFT JOIN
 SELECT * FROM expanded_claims_data
 ;
 
--- 2.0
+-- Task 2.0
 -- Present a monthly time series of the total claimed amount with a STARTS_AT for the months from January 2023 to May 2024.
 -- Calculate the total claimed amount by month
 SELECT DATE_TRUNC('month', condition_treatment_start_date) AS starts_at,
@@ -146,6 +176,7 @@ SELECT COUNT(*) - COUNT(claim_id) AS missing_claim_id,
 	   COUNT(*) - COUNT(condition_claimed_amount) AS missing_claimed_amount
 FROM expanded_claims_data
 ;
+-- There are no missing values in any of the important columns
 
 
 -- 2. Check for duplicate entries
@@ -209,7 +240,7 @@ WHERE condition_known_from_date > condition_treatment_start_date
 -- There are 5 claim_ids where the treatment_start_date is earlier than the condition_known_from_date
 
 
--- Improve the dataset
+-- Data Transformation and Improvement
 -- Remove the claim_ids with duplicate claimed_amount, audit_status and conditions
 -- Also note that, remove only those with net_amount <= 0
 DELETE FROM condition_data
@@ -248,6 +279,7 @@ CREATE INDEX idx_claim_id_condition ON condition_data (claim_id)
 -- 1.3 Index on audit_status table
 CREATE INDEX idx_claim_id_audit_status ON audit_status (claim_id)
 ;
+
 
 -- 2. Data Quality checks
 -- Trigger to check for negative claimed amounts
